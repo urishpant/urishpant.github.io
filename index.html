@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>The Chelsea Premier League Predictor Project</title>
+  <meta charset="utf-8">
+  <meta name="description" content="The Chelsea Premier League Predictor Project">
+  <meta name="author" content="Urish Pant">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>The Chelsea Premier League Predictor Project</h1>
+    <h2>Can other teams catch Chelsea?</h2>
+    <p>Urish Pant<br/>Engineer</p>
+  </hgroup>
+    <a href="https://github.com/rkmaharjan80783/FootballShinyApp/zipball/gh-pages" class="example">
+     Download
+    </a>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Slide 1</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Introduction</p>
+
+<p>Who would use this?</p>
+
+<ul>
+<li>Chelsea have been dominant in the Premier League this season. They are 3 points clear and have a game in hand, with just 10 games left.</li>
+<li>However, they still have some tricky games coming up including Man Utd and Arsenal.</li>
+<li>Football fans would be able to see easily how many points Chelsea will end up on by predicting the results of their remaining games.</li>
+<li>They can then see how many points their team would still require to win the league.</li>
+<li>Something like this could be expanded to include all remaining Premier League fixtures.</li>
+<li>The project could then be featured on something like the <a href="http://www.bbc.com/sport/football/premier-league">BBC&#39;s premier league official website</a>.</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>Slide 2</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The ui.R file</p>
+
+<ul>
+<li>It uses the fluidPage layout.</li>
+<li>Then, to ensure all the information is not crammed onto one page, the tabsetPanel has been used to effectively put multiple pages all on one page.</li>
+<li>Radio buttons have been used instead of a select menu. It will be easy for users to select the choice.</li>
+</ul>
+
+<pre><code class="r">radioButtons(&quot;southampton&quot;, &quot;16/03 - Chelsea vs Southampton&quot;,
+                                              c(&quot;Chelsea Win&quot; = &quot;win&quot;,
+                                                &quot;Draw&quot; = &quot;draw&quot;,
+                                                &quot;Chelsea Loss&quot; = &quot;loss&quot;), inline=TRUE)
+</code></pre>
+
+<pre><code>## Error in eval(expr, envir, enclos): could not find function &quot;radioButtons&quot;
+</code></pre>
+
+<ul>
+<li>The results are just shown as lines of text. The presentation here is very basic but the information is still clearly conveyed.</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>Slide 3</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The server.R file</p>
+
+<ul>
+<li>Makes use of the renderDataTable function. This means that the results can be stored in server.R as a data frame for easy R calculation.</li>
+</ul>
+
+<pre><code class="r">output$lTable &lt;- renderDataTable(leagueTable, options=list(paging = FALSE, 
+                                                           searching = FALSE))
+</code></pre>
+
+<ul>
+<li>Turning a radio buttin input from text into a number is not trivial and the switch function must be used.</li>
+</ul>
+
+<pre><code class="r">southampton &lt;- reactive({
+                        switch(input$southampton, &quot;win&quot; = 3, 
+                                                  &quot;draw&quot; = 1, 
+                                                  &quot;loss&quot; = 0)
+                })
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h2>Slide 4</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The Calculations</p>
+
+<ul>
+<li>The points are assigned to each fixture similarly to this. Then Chelsea&#39;s total points are calculated:</li>
+</ul>
+
+<pre><code class="r">southampton &lt;- 3; hull &lt;- 1; stoke &lt;- 3; qpr &lt;- 3; manutd &lt;- 0; arsenal &lt;- 1; 
+leicester &lt;- 3; crystalpalace &lt;- 3; liverpool &lt;- 1; westbrom &lt;- 3; sunderland &lt;- 3
+</code></pre>
+
+<pre><code class="r">totPoints &lt;- 63 + southampton + hull + stoke + qpr + manutd + arsenal + leicester + 
+        crystalpalace + liverpool + westbrom + sunderland; totPoints
+</code></pre>
+
+<pre><code>## [1] 87
+</code></pre>
+
+<ul>
+<li>And then the points another team (eg Southampton) requires to win can be calculated</li>
+</ul>
+
+<pre><code class="r">southamptonNeed &lt;- 64 + totPoints - 28; southamptonNeed
+</code></pre>
+
+<pre><code>## [1] 123
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Slide 1'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Slide 2'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Slide 3'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Slide 4'>
+         4
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
